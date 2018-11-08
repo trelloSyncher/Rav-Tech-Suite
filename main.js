@@ -1,6 +1,19 @@
-let createTemplate=require("./MakeBoardsFromTemplate");
-var templateA = {name: 'Template A', id: '5bcc8ce2c3b57a2906f49329'}
-var templateB = {name: 'Template b', id: '5bc4b0223b430a85843102bc'}
-var templateC = {name: 'running board', id: '5bcdd134654a6d884f18819b'}
+let create = require("./template-board.js")
 
-createTemplate.getTemplate(templateC); 
+/**
+ * Gets a pupsub with "project name"," choosen template name","user stories" and all project tasks
+ * @returns {object} object with all the above
+ */
+function getProjectLaunchedPupsub() {
+    let tempOutput = {
+        projectName: "RT-Suite3",
+        templateName: "Template C"
+    }
+
+    return tempOutput
+
+}
+console.log(getProjectLaunchedPupsub().projectName);
+
+
+create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)
