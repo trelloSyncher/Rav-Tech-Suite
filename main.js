@@ -16,4 +16,6 @@ function getProjectLaunchedPupsub() {
 console.log(getProjectLaunchedPupsub().projectName);
 
 
-create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)
+// create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)
+
+
