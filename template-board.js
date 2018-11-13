@@ -12,7 +12,8 @@ var idOrganization = '5b7aa60c58c0653c14fd503e'
 /**
  * Get's the id of a specified list and then calls the "getTemplate function" 
  * 
- * @param {string} listName The name of the list that her id is nedded
+ * @param {string} listName The name of the list whose ID is needed
+
  * @param {string} projectName The current project name that is also the project board name
  */
 async function getListId(listName, projectName) {
