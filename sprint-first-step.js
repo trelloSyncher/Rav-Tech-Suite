@@ -20,7 +20,7 @@ async function startSprint(){
 }
 
 /**
- * Get's the the project  board and "sprint candiste" list ID via api
+ * Get's the the project  board and "sprint candidte" list ID via api
  * 
  * @param {strnig} idOrganization the ID number of trello team(organization)
  * @param {strnig} projectName the name of the current project that is also the name of the project board
