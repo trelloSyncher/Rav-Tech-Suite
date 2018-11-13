@@ -9,7 +9,12 @@ var idOrganization = '5b7aa60c58c0653c14fd503e'
 
 
 
-
+/**
+ * Get's the id of a specified list and then calls the "getTemplate function" 
+ * 
+ * @param {string} listName The name of the list that her id is nedded
+ * @param {string} projectName The current project name that is also the project board name
+ */
 async function getListId(listName, projectName) {
 
     let listId;
@@ -41,7 +46,12 @@ async function getListId(listName, projectName) {
 
     getTemplate(listId, projectName)
 }
-
+/**
+ * Get's the cards in a specific trello list by id of the list and then calls "createBoard" function
+ * 
+ * @param {strnig} templateId The id of the list that conatains the chosen template
+ * @param {string} projectName The name of the current project
+ */
 function getTemplate(templateId, projectName) {
 
     var listNamesArr = []
@@ -68,7 +78,12 @@ function getTemplate(templateId, projectName) {
     })
 }
 
-
+/**
+ * Creats a new trello board and then calls the "createLists" function
+ * 
+ * @param {string} boardName The name of the created board should be
+ * @param {array} listNamesArr  An array of strnigs that should be the created lists names
+ */
 function createBoard(boardName, listNamesArr) {
 
     var options = {
@@ -104,6 +119,13 @@ function createBoard(boardName, listNamesArr) {
     });
 }
 
+/**
+ * Create lists in a trello board
+ * 
+ * @param {string} idBoard The id of the board that the created lists should be in
+ * @param {int} index  A number thatpronounce the current functions Iteration (the function is recursive)
+ * @param {*} listNamesArr  An array of strnigs that should be the created lists names
+ */
 function createLists(idBoard, index, listNamesArr) {
     if (index < listNamesArr.length) {
         const listName = listNamesArr[index];
