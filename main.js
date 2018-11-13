@@ -1,4 +1,5 @@
 let create = require("./template-board.js")
+let sprinter = require("./sprint-first-step")
 
 /**
  * Gets a pupsub with "project name"," choosen template name","user stories" and all project tasks
@@ -6,14 +7,14 @@ let create = require("./template-board.js")
  */
 function getProjectLaunchedPupsub() {
     let tempOutput = {
-        projectName: "RT-Suite3",
+        projectName: "RT Suite",
         templateName: "Template C"
     }
 
     return tempOutput
 
 }
-console.log(getProjectLaunchedPupsub().projectName);
 
 
-create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)
+// sprinter.startSprint()
+// create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)
