@@ -1,12 +1,11 @@
-const trelloTemplateBboardId = '5bc4afc9bfdbd95f57fe35b4'
 const promiseRequest = require('request-promise');
-const information = require("./hardcoded.js")
 const request = require("request");
+const information = require("./main/hardcoded.js")
 
+const trelloTemplateBboardId = information.trelloTemplateBboardId
 const key = information.key;
 const token = information.token;
 const idOrganization = information.idOrganization
-
 
 
 
@@ -33,18 +32,29 @@ async function getListId(listName, projectName) {
             const currentListName = data[index].name;
 
             if (listName === currentListName) {
-
+// TO
                 listId = currentListId
             }
         }
     })
-
-    getTemplate(listId, projectName)
+return listId
+}
+// name()
+async function name() {
+    
+    var listiddddddd = await getListId('Template C')
+   
+   var TemplateToCreate = await getTemplate(listiddddddd)
+    
+    createBoard(TemplateToCreate)
+   
+    console.log(listiddddddd);
+    console.log(TemplateToCreate);
 }
 
-async function getTemplate(templateId, projectName) {
+async function getTemplate(templateId) {
 
-    var listNamesArr = []
+    let listNamesArr = [];
     var options = {
         method: 'GET',
         url: 'https://api.trello.com/1/lists/' + templateId + '/cards',
@@ -55,7 +65,7 @@ async function getTemplate(templateId, projectName) {
         }
     };
 
-    await request(options, function (error, response, body) {
+    await promiseRequest(options, function (error, response, body) {
         if (error) throw new Error(error);
 
         var data = JSON.parse(body)
@@ -64,8 +74,8 @@ async function getTemplate(templateId, projectName) {
 
             listNamesArr.push(listName)
         }
-        createBoard(projectName, listNamesArr)
     })
+    return listNamesArr
 }
 
 
@@ -124,7 +134,9 @@ async function createLists(idBoard, index, listNamesArr) {
        await request(options, function (error, response, body) {
             if (error) throw new Error(error);
 
+            console.log(response);
         })
+        
         createLists(idBoard, index + 1, listNamesArr)
     }
 

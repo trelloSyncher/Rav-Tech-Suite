@@ -1,26 +1,29 @@
 const request = require("request");
 const promiseRequest = require('request-promise');
 const axios= require("axios");
-const information = require("./hardcoded.js")
+const information = require("./main/hardcoded.js")
 const key = information.key;
 const token = information.token;
 const idOrganization = information.idOrganization
 
-let sprintRecivedTasks = ['C1','C2','C6','C7'] // TO DO this is a temp var. real one comes from plenner in a pupsub 
-let projectName =  'RT-Suite';  // TO DO this is a temp var. real one comes from plenner in a pupsub 
+// let sprintRecivedTasks = ['C1','C2','C6','C7'] // TO DO this is a temp var. real one comes from plenner in a pupsub 
+// let projectName =  'RT-Suite';  // TO DO this is a temp var. real one comes from plenner in a pupsub 
 
 
-startSprint()
+// startSprint()
 
-async function startSprint(){
+async function startSprint(projectName, sprintRecivedTasks){
     const boardInfoObj = await getBoardId(idOrganization, projectName)
-   await compareCards(boardInfoObj.boardId, sprintRecivedTasks, boardInfoObj.sprintCandidate)
+    const cardToMoveArr = await compareCards(boardInfoObj.boardId, sprintRecivedTasks, boardInfoObj.sprintCandidate)
+    moveCard(cardToMoveArr, boardInfoObj.sprintCandidate)
+    
 }
 
 
 async function getBoardId(idOrganization, projectName) {
     let currentProjectId;
     let candidateListId;
+    
     const options = {
         method: 'GET',
         url: 'https://api.trello.com/1/organizations/' + idOrganization + '/boards',
@@ -63,6 +66,7 @@ async function getBoardId(idOrganization, projectName) {
 
 async function compareCards(idBoard, taskaArr, candidate){
     
+    let cardsToMove = [];
     const options = {
         method: 'GET',
         url: 'https://api.trello.com/1/boards/' + idBoard,
@@ -82,7 +86,6 @@ async function compareCards(idBoard, taskaArr, candidate){
         const data = JSON.parse(body)
         
         
-        
         for (let index = 0; index < data.cards.length; index++) {
             element = data.cards[index].name;
             cardId =  data.cards[index].id;
@@ -92,18 +95,23 @@ async function compareCards(idBoard, taskaArr, candidate){
                 const sprintElement = taskaArr[i];
                 
                 if (sprintElement === element) {
-                    moveCard(cardId, candidate)
+                    cardsToMove.push(cardId)
+                    
                 }
             }
         }
         
     });
+    return cardsToMove
 }
 
 
-function moveCard(cardId,  candidateId){
-    
-    axios.put(`https://api.trello.com/1/cards/${cardId}?idList=${candidateId}&key=${key}&token=${token}`)
+function moveCard(cardToMoveArr,  candidateId){
+    for (let i = 0; i < cardToMoveArr.length; i++) {
+        const cardId = cardToMoveArr[i];
+        axios.put(`https://api.trello.com/1/cards/${cardId}?idList=${candidateId}&key=${key}&token=${token}`)
+        
+    }
     
     
 }

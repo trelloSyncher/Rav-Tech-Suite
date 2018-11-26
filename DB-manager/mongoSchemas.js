@@ -4,8 +4,6 @@ const Schema = mongoose.Schema;
 const cardSchema = new Schema({
     name: String,
     trelloId: String,
-    boardId: String,
-    shortLink: String,
     listId: String,
     url: String,
     estimate: Number,
@@ -16,15 +14,24 @@ const cardSchema = new Schema({
 
 });
 
+
   
 const sprintTrackerSchema= new Schema({
     projectName: {type:String, unique:true, required:true},
     sprintNum:  {type:Number, required:true},
+    sprintDay: {type:Number, default:0}, 
     startDate: {type:Date, default: Date.now},
     idealBurn:[Number],
     actualBurn: [Number]
 });
 
+const bugSchema = new Schema({
+    build: String,
+	bugId: String,
+	title: String,
+    cardTrelloId: String,
+	details: String 
+    
+})
 
-
-module.exports = {cardSchema, sprintTrackerSchema}
+module.exports = {cardSchema, sprintTrackerSchema, bugSchema}
