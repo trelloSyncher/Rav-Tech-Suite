@@ -47,29 +47,29 @@ app.post('/api/v1/:projectName/bugs',async function (req, res) {
     const trelloInfoObj = await addNewCardToList(bugsListId, bugObject)
     // console.log(trelloInfoObj.url);
     
-    await addBugToDB(projectName, bugObject, trelloInfoObj.trelloId)
+    await DBManager.addBugToDB(projectName, bugObject, trelloInfoObj.trelloId)
     res.send(trelloInfoObj.url);
 });
 
-async function addBugToDB(boardName, bugObject, trelloId){
-    await DBManager.launchDB('Bugs')
-    const bugModel = mongoose.model(boardName, schemas.bugSchema)
+// async function addBugToDB(boardName, bugObject, trelloId){
+//     await DBManager.launchDB('Bugs')
+//     const bugModel = mongoose.model(boardName, schemas.bugSchema)
     
-    bugModel.create(
-        {
-            build:  bugObject.title,
-            bugId: bugObject.bugId,
-            title: bugObject.title,
-            cardTrelloId: trelloId,
-            details: bugObject.details 
+//     bugModel.create(
+//         {
+//             build:  bugObject.title,
+//             bugId: bugObject.bugId,
+//             title: bugObject.title,
+//             cardTrelloId: trelloId,
+//             details: bugObject.details 
             
-        }
-        , function (err, small) {
-            if (err) return handleError(err);
-            // saved!
-        });
+//         }
+//         , function (err, small) {
+//             if (err) return handleError(err);
+//             // saved!
+//         });
         
-    }
+//     }
     
     /**
      *  posting a new comment in an axist bug-card in trello board 
@@ -78,6 +78,7 @@ async function addBugToDB(boardName, bugObject, trelloId){
 */
 app.post('/api/v1/:projectName/bugs/:bug_id/notes',async function (req, res) {
     const data = req.params
+    const bugId = data.bug_id
     const projectName = await trello.makeStr(data.projectName)
     const boardId = await trello.getBoardIdByProjectName(projectName)
         const comment = await req.body
