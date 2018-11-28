@@ -16,7 +16,7 @@ async function stam(){
 }
 
 async function getBoardIdByProjectName(projectName){
-    const allBoards = await axios.get(`https://api.trello.com/1/organizations/${idOrganization}/boards?key=${key}&token=${token}`)
+    const allBoards = await axios.get(`https://api.trello.com/1/organizations/${idOrganization}/boards?fields=name%2Cid&key=${key}&token=${token}`)
     
     for (let i = 0; i < allBoards.data.length; i++) {
         const currentProjectName = await makeStr(allBoards.data[i].name);
@@ -27,6 +27,14 @@ async function getBoardIdByProjectName(projectName){
         }
     }
     
+}
+
+
+// getListNameByCardId('5bf19915e72b96582c5a7586')
+async function getListNameByCardId(cardId){
+    const allData = await axios.get(`https://api.trello.com/1/cards/${cardId}/list?fields=name&key=${key}&token=${token}`)
+// console.log(allData.data.name);
+return allData.data.name
 }
 // getListIdByLstName('5be18d88079e360d223546ac')
 async function getBugsListId(boardId){
@@ -48,9 +56,25 @@ async function getBugsListId(boardId){
 
 }
 
-function makeStr(st){
-    st = st.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+
+
+const addCommentToCard = async (cardId, note)=>{
+    console.log('cardObj: ' , cardId);
+    
+    try{
+        var newNote = await axios.post(`https://api.trello.com/1/cards/${cardId}/actions/comments?text=${note}&key=${key}&token=${token}`);
+        
+      } catch  (error) {
+          throw new Error(error);
+      }
+
+  }
+  
+
+async function makeStr(st){
+    st = await st.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     return st
   }
 
-module.exports = {getBoardIdByProjectName, getBugsListId, makeStr}
+module.exports = {getBoardIdByProjectName, getBugsListId, getListNameByCardId, makeStr, addCommentToCard}

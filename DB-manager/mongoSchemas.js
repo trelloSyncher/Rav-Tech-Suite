@@ -26,8 +26,9 @@ const sprintTrackerSchema= new Schema({
 });
 
 const bugSchema = new Schema({
+    projectName: String,
     build: String,
-	bugId: String,
+	bugId: {type:String, unique:true, required:true},
 	title: String,
     cardTrelloId: String,
 	details: String 

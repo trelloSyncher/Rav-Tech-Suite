@@ -7,6 +7,12 @@ const information = {
     bugsBacklog: 'Bugs Backlog',
     candidateListName : 'Sprint candidate',
     },
+    bugs:{
+        DBName: 'Bugs',
+        BugsBacklog: 'Bugs Backlog',
+        BugsToBeTested: 'Bugs To Be Tested',
+        BugsDone: 'Bugs Done'
+    },
     testLInkModleApi : '10.2.1.105:3333/',
 
 
