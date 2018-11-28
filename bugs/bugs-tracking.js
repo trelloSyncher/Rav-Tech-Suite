@@ -1,11 +1,11 @@
 var express = require('express');
 const mongoose = require('mongoose')
 const axios = require("axios")
-var path = require('path');
-var bodyParser = require('body-parser');
-var schemas = require("../DB-manager/mongoSchemas.js")
+const path = require('path');
+const bodyParser = require('body-parser');
+// var schemas = require("../DB-manager/mongoSchemas.js")
 var DBManager = require("../DB-manager/manager-db.js")
-const trello = require('../main/trello-tools.js')
+const trelloTools = require('../main/trello-tools.js')
 const information = require("../main/hardcoded.js")
 const key = information.trello.key;
 const token = information.trello.token;
@@ -20,125 +20,119 @@ app.use(bodyParser.urlencoded({
 }))
 
 
-//   const stamObj = {
-//       title: 'My title',
-//       build: 'My build',
-//       details: 'Details'
-//   }
-
-// stam()
-// async function stam(){
-//     let boardId = await trello.getBoardIdByProjectName('running board')
-//     const bugsList = await trello.getBugsListId(boardId)
-//     console.log(bugsList);
-// }
-
 /**
-*  posting a new bug-card in trello board in a bugs-backlog list
-* @param {string} projectName thru url 
-*/
+ *  posting a new bug-card in trello board in a bugs-backlog list
+ * @param {string} projectName thru url 
+ */
 
-app.post('/api/v1/:projectName/bugs',async function (req, res) {
+app.post('/api/v1/:projectName/bugs', async function (req, res) {
     let data = req.params
-    const projectName = await trello.makeStr(data.projectName)
     const bugObject = await req.body
-    const boardId = await trello.getBoardIdByProjectName(projectName)
-    const bugsListId = await trello.getBugsListId(boardId)
-    const trelloInfoObj = await addNewCardToList(bugsListId, bugObject)
+    const projectName = await trelloTools.makeStr(data.projectName)
+    const boardId = await trelloTools.getBoardIdByProjectName(projectName)
+    const bugsListId = await trelloTools.getBugsListId(boardId)
+    const trelloInfoObj = await addNewBugToBacklogList(bugsListId, bugObject)
     // console.log(trelloInfoObj.url);
-    
+
     await DBManager.addBugToDB(projectName, bugObject, trelloInfoObj.trelloId)
     res.send(trelloInfoObj.url);
 });
 
-// async function addBugToDB(boardName, bugObject, trelloId){
-//     await DBManager.launchDB('Bugs')
-//     const bugModel = mongoose.model(boardName, schemas.bugSchema)
-    
-//     bugModel.create(
-//         {
-//             build:  bugObject.title,
-//             bugId: bugObject.bugId,
-//             title: bugObject.title,
-//             cardTrelloId: trelloId,
-//             details: bugObject.details 
-            
-//         }
-//         , function (err, small) {
-//             if (err) return handleError(err);
-//             // saved!
-//         });
-        
-//     }
-    
-    /**
-     *  posting a new comment in an axist bug-card in trello board 
-     * @param {string} projectName thru url 
-* @param {string} bug_id thru url 
-*/
-app.post('/api/v1/:projectName/bugs/:bug_id/notes',async function (req, res) {
+
+/**
+ *  posting a new comment in an axist bug-card in trello board 
+ * @param {string} projectName thru url 
+ * @param {string} bug_id thru url 
+ */
+app.post('/api/v1/:projectName/bugs/:bug_id/notes', async function (req, res) {
+    const comment = req.body
+
     const data = req.params
     const bugId = data.bug_id
-    const projectName = await trello.makeStr(data.projectName)
-    const boardId = await trello.getBoardIdByProjectName(projectName)
-        const comment = await req.body
 
-      console.log(res.statusCode);
-    //   addCommentToCard()
-    //   const bugsListId = await trello.getBugsListId(boardId)
-    //   const url = await addNewCardToList(bugsListId, bugObject)
-      res.send(res.statusCode);
-    });
-// app.get('/api/v1/:projectName/bugs',async function (req, res) {
-//     let data = res
-//     // console.log(data);
-//     let a = {web_url:'http://demo.com/demo'}
-// //    let url = await addNewCardToList('5be42dcb7549dc467801a127', data)
-//     res.send(data);
-//   });
+    const cardId = await DBManager.findBugTrelloId(bugId)
+    await trelloTools.addCommentToCard(cardId, comment.body)
+
+    const status = await res.statusCode;
+    res.sendStatus(status);
+});
+
+app.get('/api/v1/bugs/:bug_id',async function (req, res) {
+    
+    const data = req.params
+    const bugId = data.bug_id
+
+    const cardId = await DBManager.findBugTrelloId(bugId)
+    const bugState = await getBugState(cardId)
+    
+    res.send({
+        bugId: bugId,
+        state: bugState
+    })
+
+});
+app.get('/api/v1/:projectName/bugs', async function (req, res) {
+    let data = req.params
+    
+    const bugsArr = await DBManager.findBugsByProjectName(data.projectName)
+  const result = await getProjectBugsState(bugsArr)
+    
 
 
-  const addNewCardToList = async (listId, cardObj)=>{
-      console.log('cardObj: ' , cardObj);
-      
-      try{
-          var card = await axios.post(`https://api.trello.com/1/cards?name=${cardObj.title}&desc=${cardObj.details}&idList=${listId}&keepFromSource=all&key=${key}&token=${token}`);
+    res.send(result)
+
+});
+
+
+const addNewBugToBacklogList = async (listId, cardObj) => {
+    console.log('cardObj: ', cardObj);
+
+    try {
+        var card = await axios.post(`https://api.trello.com/1/cards?name=${cardObj.title}&desc=${cardObj.details}&idList=${listId}&keepFromSource=all&key=${key}&token=${token}`);
         // console.log(card.data);
-          
-        } catch  (error) {
-            throw new Error(error);
-        }
-        return( {url: card.data.url, trelloId: card.data.id})
+
+    } catch (error) {
+        throw new Error(error);
     }
+    return ({
+        url: card.data.url,
+        trelloId: card.data.id
+    })
+}
+async function getProjectBugsState(bugsArr){
+    let finalArr = []
+
+for(const bug of bugsArr)  {
+
+   const bugState = await getBugState( bug.trelloId)
+
+   await finalArr.push( {bugId: bug.bugId, state: bugState})
+}
+//  console.log(finalArr);
+
+
+return finalArr
+}
+
+async function getBugState(cardId){
+    const listName = await trelloTools.getListNameByCardId(cardId)
+    switch (listName) {
+        case information.bugs.BugsBacklog:
+        return 1
+            break;
+        case information.bugs.BugsToBeTested:
+        return 2
+            break;
+        case information.bugs.BugsDone:
+        return 3
+            break;
     
-    
-
-
-  const addCommentToCard = async (cardId)=>{
-      console.log('cardObj: ' , cardId);
-      
-      try{
-          var newNote = await axios.post(`https://api.trello.com/1/cards/${cardId}/actions/comments?text=${note}&key=${key}&token=${token}`);
-          
-        } catch  (error) {
-            throw new Error(error);
-        }
-
+        default:
+        return 'hello'
+            break;
     }
-    
-    
+}
 
 
-app.get('/', function (req, res) {
-    console.log("hi");
-    res.send('<h1> home page</h1>')
-
-});
-app.get('/about', function (req, res) {
-    console.log("hi");
-    res.send('<h1> about page</h1>')
-
-});
 app.use(express.static('public'))
 app.listen(5555);
-
