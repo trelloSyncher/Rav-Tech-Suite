@@ -15,17 +15,56 @@ async function stam(){
     console.log(bugsList);
 }
 
+async function getProjectName(boardId) {
+    var response = await axios.get(`https://api.trello.com/1/boards/${boardId}/name?key=${key}&token=${token}`)
+
+    var boardObj = response.data
+    var boardName = boardObj._value
+
+
+    return boardName
+}
+async function getLists(boardId) {
+    try {
+        var lists = await axios.get(`https://api.trello.com/1/boards/${boardId}/lists?cards=none&filter=open&fields=name%2Cid&key=${key}&token=${token}`)
+
+        return lists.data
+    } catch  (error) {
+        throw new Error(error);
+    }
+}
+
+
+async function getCards(listId) {
+
+    var cards = await axios.get(`https://api.trello.com/1/lists/${listId}/cards?pluginData=true&fields=name%2Cid%2Curl%2CidList&key=${key}&token=${token}`)
+    var listCardsArr = cards.data
+    // console.log(cards.data)
+    //
+
+    return listCardsArr
+
+
+}
+
+
 async function getBoardIdByProjectName(projectName){
+    try{
+    const projectNameStr = await makeStr(projectName)
     const allBoards = await axios.get(`https://api.trello.com/1/organizations/${idOrganization}/boards?fields=name%2Cid&key=${key}&token=${token}`)
+    console.log(projectNameStr);
     
     for (let i = 0; i < allBoards.data.length; i++) {
         const currentProjectName = await makeStr(allBoards.data[i].name);
-        if(projectName === currentProjectName){
+        if(projectNameStr === currentProjectName){
             const currentProjectId =  allBoards.data[i].id;
             return currentProjectId
             
         }
     }
+   
+} catch  (error) {
+}
     
 }
 
@@ -36,6 +75,16 @@ async function getListNameByCardId(cardId){
 // console.log(allData.data.name);
 return allData.data.name
 }
+
+async function getCandidateListId(boardId){
+    const allLists = await axios.get(`https://api.trello.com/1/boards/${boardId}/lists?cards=none&fields=id%2Cname&key=${key}&token=${token}`)
+
+    for (let i = 0; i < allLists.data.length; i++) {
+        const currentListtName = allLists.data[i].name;
+        if(currentListtName === information.trello.candidateListName){
+            const candidateListId =  allLists.data[i].id;
+            return candidateListId
+}}}
 // getListIdByLstName('5be18d88079e360d223546ac')
 async function getBugsListId(boardId){
     // console.log(boardId);
@@ -76,5 +125,28 @@ async function makeStr(st){
     st = await st.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     return st
   }
+//   getCardsByBoardId(information.trello.trelloTemplateBboardId)
+ 
+  async function getCardsByBoardId(boardId){
+     
+     const cards = await axios.get(`https://api.trello.com/1/boards/${boardId}/cards/?fields=name&member_fields=fullName&key=${key}&token=${token}`) 
+     return cards.data
+     
+}
 
-module.exports = {getBoardIdByProjectName, getBugsListId, getListNameByCardId, makeStr, addCommentToCard}
+function moveCard(cardToMoveArr,  listId){
+    try {
+        
+        for (let i = 0; i < cardToMoveArr.length; i++) {
+            const cardId = cardToMoveArr[i];
+            axios.put(`https://api.trello.com/1/cards/${cardId}?idList=${listId}&key=${key}&token=${token}`)
+            
+        }
+    } catch (error) {
+        console.log('throw new Error(moveCard)')
+    }
+    
+    
+}
+
+module.exports = {moveCard, getCardsByBoardId, getCards, getLists, getProjectName, getBoardIdByProjectName, getCandidateListId, getBugsListId, getListNameByCardId, makeStr, addCommentToCard}
