@@ -1,9 +1,7 @@
 var express = require('express');
 const mongoose = require('mongoose')
 const axios = require("axios")
-const path = require('path');
 const bodyParser = require('body-parser');
-// var schemas = require("../DB-manager/mongoSchemas.js")
 var DBManager = require("../DB-manager/manager-db.js")
 const trelloTools = require('../main/trello-tools.js')
 const information = require("../main/hardcoded.js")
@@ -32,15 +30,20 @@ app.post('/api/v1/:projectName/bugs', async function (req, res) {
     const boardId = await trelloTools.getBoardIdByProjectName(projectName)
     const bugsListId = await trelloTools.getBugsListId(boardId)
     const trelloInfoObj = await addNewBugToBacklogList(bugsListId, bugObject)
-    // console.log(trelloInfoObj.url);
 
     await DBManager.addBugToDB(projectName, bugObject, trelloInfoObj.trelloId)
-    res.send(trelloInfoObj.url);
+    console.log(trelloInfoObj.url);
+    const webUrl = {
+        web_url: trelloInfoObj.url
+    }
+    res.send(webUrl);
 });
 
 
 /**
  *  posting a new comment in an axist bug-card in trello board 
+ * and return status code back to client
+ * 
  * @param {string} projectName thru url 
  * @param {string} bug_id thru url 
  */
@@ -57,26 +60,38 @@ app.post('/api/v1/:projectName/bugs/:bug_id/notes', async function (req, res) {
     res.sendStatus(status);
 });
 
-app.get('/api/v1/bugs/:bug_id',async function (req, res) {
-    
+/**
+ *  sending status iformation on spesific bug
+ * return object contain bug-id, bug-status 
+ * @param {string} bug_id thru url 
+ */
+app.get('/api/v1/bugs/:bug_id', async function (req, res) {
+
     const data = req.params
     const bugId = data.bug_id
 
     const cardId = await DBManager.findBugTrelloId(bugId)
     const bugState = await getBugState(cardId)
-    
+
     res.send({
         bugId: bugId,
         state: bugState
     })
 
 });
+
+
+/**
+ *  sending bugs status iformation on all project
+ * return list of objects contain bug-id, bug-status 
+ * @param {string} bug_id thru url 
+ */
 app.get('/api/v1/:projectName/bugs', async function (req, res) {
     let data = req.params
-    
+
     const bugsArr = await DBManager.findBugsByProjectName(data.projectName)
-  const result = await getProjectBugsState(bugsArr)
-    
+    const result = await getProjectBugsState(bugsArr)
+
 
 
     res.send(result)
@@ -99,36 +114,39 @@ const addNewBugToBacklogList = async (listId, cardObj) => {
         trelloId: card.data.id
     })
 }
-async function getProjectBugsState(bugsArr){
+async function getProjectBugsState(bugsArr) {
     let finalArr = []
 
-for(const bug of bugsArr)  {
+    for (const bug of bugsArr) {
 
-   const bugState = await getBugState( bug.trelloId)
+        const bugState = await getBugState(bug.trelloId)
 
-   await finalArr.push( {bugId: bug.bugId, state: bugState})
+        await finalArr.push({
+            bugId: bug.bugId,
+            state: bugState
+        })
+    }
+    //  console.log(finalArr);
+
+
+    return finalArr
 }
-//  console.log(finalArr);
 
-
-return finalArr
-}
-
-async function getBugState(cardId){
+async function getBugState(cardId) {
     const listName = await trelloTools.getListNameByCardId(cardId)
     switch (listName) {
         case information.bugs.BugsBacklog:
-        return 1
+            return 1
             break;
         case information.bugs.BugsToBeTested:
-        return 2
+            return 2
             break;
         case information.bugs.BugsDone:
-        return 3
+            return 3
             break;
-    
+
         default:
-        return 'hello'
+            return 'hello'
             break;
     }
 }

@@ -29,7 +29,7 @@ function launchDB(dbName, projectName) {
 
 
 
-async function saveCardsToDb(cardObj, boardName, ) {
+async function saveCardsToDb(cardObj, boardName ) {
     launchDB("Projects")
 
     console.log("saveCardsToDb invoked!!!!!!!!!!!!!!!!!!! ", boardName);
@@ -115,6 +115,38 @@ async function getCards(listId) {
 }
 
 
+async function runs(boardId) {
+    // var boardobj = await trelloTolls.getBoardId(idOrganization, projectName)
+    // var boardId = boardobj.boardId
+    var boardName = await getProjectName(boardId)
+    var allLists = await getLists(boardId)
+    var sprintDay = await  sprintDayUpdate(boardName, 123)
+    
+     console.log('sprintDay from runs :',sprintDay);
+    
+    for (let index = 0; index < allLists.length; index++) {
+        const currrentList = allLists[index];
+        var listName = currrentList.name
+        if (listName.includes('%') ) {
+            let listId = currrentList.id
+            var templist = await getCards(listId)
+            // console.log(templist);
+            for (let i = 0; i < templist.length; i++) {
+                const tempCard = templist[i];
+                let dbReadyCard = await convertCardToDbReady(tempCard)
+                // await saveCardsToDb(dbReadyCard, boardName)
+                // console.log(tempCard);
+                
+            }
+            
+           // console.log(listName);
+           }
+        // console.log(list.name);
+     }
+    // createSprintTrackerDB(boardName ,15, 123)
+    
+    //  console.log(mylists);
+}
 
 
 
@@ -126,7 +158,7 @@ async function createSprintTrackerDB(projectName, sprintLength, sprintNum) {
     var firstSprinter = new sprintTrackerModel({
         projectName: projectName,
         sprintNum: sprintNum,
-        idealBurn: new Array(sprintLength).fill(0),
+        idealBurn: [],
         actualBurn: new Array(sprintLength).fill(0)
     });
     sprintTrackerModel.save(function (err, firstSprinter) {
@@ -204,107 +236,9 @@ async function sprintDayUpdate(projectName, sprintNum) {
     
     
     
-    async function runs(boardId) {
-        // var boardobj = await trelloTolls.getBoardId(idOrganization, projectName)
-        // var boardId = boardobj.boardId
-        var boardName = await getProjectName(boardId)
-        var myLists = await getLists(boardId)
-        var sprintDay = await  sprintDayUpdate(boardName, 123)
-        
-         console.log('sprintDay from runs :',sprintDay);
-        
-        for (let index = 0; index < myLists.length; index++) {
-            const currrentList = myLists[index];
-            var listName = currrentList.name
-            if (listName.includes('%') ) {
-                let listId = currrentList.id
-                var templist = await getCards(listId)
-                // console.log(templist);
-                for (let i = 0; i < templist.length; i++) {
-                    const tempCard = templist[i];
-                    let dbReadyCard = await convertCardToDbReady(tempCard)
-                    // await saveCardsToDb(dbReadyCard, boardName)
-                    // console.log(tempCard);
-                    
-                    
-                    
-                }
-                
-                
-                
-                
-                
-                
-                
-                
-                // console.log(listName);
-                
-                
-                
-                
-                
-                
-            }
-            // console.log(list.name);
-            
-            
-            
-            
-        }
-        // createSprintTrackerDB(boardName ,15, 123)
-        
-        //  console.log(mylists);
-        
-        
 
-}
-
-// runs('5be42dc918f706736ed1849f')
+runs('5be42dc918f706736ed1849f')
 // getProjectName("5be18d88079e360d223546ac")
-
-function v() {
-    launchDB('prog')
-
-    // until here "must lines" to mongoose
-
-    const cardSchema = new Schema({
-        name: String,
-        trelloId: String,
-        listId: String,
-        url: String,
-        estimate: String,
-        create_date: {
-            type: Date,
-            default: Date.now
-        }
-
-    });
-
-
-    const cardModel = mongoose.model('boardName', cardSchema)
-    var cardObj = {
-        name: "rawCardObj.name",
-        id: "rawCardObj.id",
-        idList: "rawCardObj",
-        url: "rawCrdObj",
-        estimate: "estimate"
-    }
-
-    console.log(cardObj);
-
-    cardModel.create(
-        {
-            name: cardObj.name,
-            trelloId: cardObj.id,
-            listId: cardObj.idList,
-            url: cardObj.url,
-            estimate: cardObj.estimate,
-        }
-    )
-
-
-}
-// v();
 
 
 

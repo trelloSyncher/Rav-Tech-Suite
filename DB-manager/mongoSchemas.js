@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const cardSchema = new Schema({
     name: String,
-    trelloId: String,
+    trelloId: {type:String, unique:true, required:true},
     listId: String,
     url: String,
     estimate: Number,
@@ -21,7 +21,7 @@ const sprintTrackerSchema= new Schema({
     sprintNum:  {type:Number, required:true},
     sprintDay: {type:Number, default:0}, 
     startDate: {type:Date, default: Date.now},
-    idealBurn:[Number],
+    idealBurn:[],
     actualBurn: [Number]
 });
 
