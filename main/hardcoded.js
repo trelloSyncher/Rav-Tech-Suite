@@ -13,6 +13,12 @@ const information = {
         BugsToBeTested: 'Bugs To Be Tested',
         BugsDone: 'Bugs Done'
     },
+    collectionName:{
+        cards: 'Card_model',
+        sprintTracker: 'Sprint_tracker'
+
+    },
+   
     testLInkModleApi : '10.2.1.105:3333/',
 
 

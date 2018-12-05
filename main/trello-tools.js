@@ -46,7 +46,20 @@ async function getCards(listId) {
 
 
 }
-
+// getBoardUrlByProjectName('test')
+async function getBoardUrlByProjectName(projectName){
+    const projectNameStr = await makeStr(projectName)
+    const allBoards = await axios.get(`https://api.trello.com/1/organizations/${idOrganization}/boards?fields=name%2Curl&key=${key}&token=${token}`)
+    for (const board of allBoards.data) {
+        const currentProjectName = await makeStr(board.name)
+        if (currentProjectName === projectNameStr) {
+            return board.url
+            
+        }
+    
+}
+    
+}
 
 async function getBoardIdByProjectName(projectName){
     try{
@@ -69,10 +82,9 @@ async function getBoardIdByProjectName(projectName){
 }
 
 
-// getListNameByCardId('5bf19915e72b96582c5a7586')
 async function getListNameByCardId(cardId){
     const allData = await axios.get(`https://api.trello.com/1/cards/${cardId}/list?fields=name&key=${key}&token=${token}`)
-// console.log(allData.data.name);
+console.log(allData.data.name);
 return allData.data.name
 }
 
@@ -85,13 +97,11 @@ async function getCandidateListId(boardId){
             const candidateListId =  allLists.data[i].id;
             return candidateListId
 }}}
-// getListIdByLstName('5be18d88079e360d223546ac')
+
 async function getBugsListId(boardId){
-    // console.log(boardId);
     
     const allLists = await axios.get(`https://api.trello.com/1/boards/${boardId}/lists?cards=none&fields=id%2Cname&key=${key}&token=${token}`)
     
-// console.log(allLists.data);
 
 
     for (let i = 0; i < allLists.data.length; i++) {
@@ -149,4 +159,4 @@ function moveCard(cardToMoveArr,  listId){
     
 }
 
-module.exports = {moveCard, getCardsByBoardId, getCards, getLists, getProjectName, getBoardIdByProjectName, getCandidateListId, getBugsListId, getListNameByCardId, makeStr, addCommentToCard}
+module.exports = {getBoardUrlByProjectName, moveCard, getCardsByBoardId, getCards, getLists, getProjectName, getBoardIdByProjectName, getCandidateListId, getBugsListId, getListNameByCardId, makeStr, addCommentToCard}

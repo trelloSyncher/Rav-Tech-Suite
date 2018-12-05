@@ -1,5 +1,6 @@
 const create = require("../template-board.js")
 const sprinter = require("../sprint-tracker/sprint-first-step.js")
+const sprintTracker = require("../sprint-tracker/sprint-burn.js")
 // const server = require('../bugs/bugs-tracking.js')
 
 
@@ -17,8 +18,11 @@ function getProjectLaunchedPupsub() {
 
 }
 
-let sprintRecivedTasks = ['task 1','task 2','task 3','task 4'] // TO DO this is a temp var. real one comes from plenner in a pupsub 
-let projectName =  'running-board';  // TO DO this is a temp var. real one comes from plenner in a pupsub 
+const sprintRecivedTasks = ['H1','H2','H3','H4'] // TO DO this is a temp var. real one comes from plenner in a pupsub 
+const projectName =  'test';  // TO DO this is a temp var. real one comes from plenner in a pupsub 
+const sprintLength = 14;
+const sprintName = 'second test';
+// sprinter.startSprint(projectName, sprintRecivedTasks, sprintLength, sprintName)
+sprintTracker.run('5be42dc918f706736ed1849f', 2, sprintName)
 
-sprinter.startSprint(projectName, sprintRecivedTasks)
 // create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)

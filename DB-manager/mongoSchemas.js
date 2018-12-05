@@ -17,12 +17,13 @@ const cardSchema = new Schema({
 
   
 const sprintTrackerSchema= new Schema({
-    projectName: {type:String, unique:true, required:true},
-    sprintNum:  {type:Number, required:true},
-    sprintDay: {type:Number, default:0}, 
+    projectName: {type:String, required:true},
+    sprintName:  {type:String, required:true},
+    sprintDay: {type:Number, default:1}, 
+    numberOfWeek: Number,
     startDate: {type:Date, default: Date.now},
-    idealBurn:[],
-    actualBurn: [Number]
+    idealBurn: [Number],
+    actualBurn:[]
 });
 
 const bugSchema = new Schema({
@@ -34,5 +35,6 @@ const bugSchema = new Schema({
 	details: String 
     
 })
-
+// module.exports = mongoose.model('sprint Tracker', sprintTrackerSchema)
+// module.exports = mongoose.model('sprint Tracker', sprintTrackerSchema)
 module.exports = {cardSchema, sprintTrackerSchema, bugSchema}

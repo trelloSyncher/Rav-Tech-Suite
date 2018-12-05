@@ -1,6 +1,6 @@
 const axios= require("axios");
 const DBManager = require('../DB-manager/manager-db')
-
+const test = require("../main/test.js")
 const trelloTools = require('../main/trello-tools.js')
 const information = require("../main/hardcoded.js")
 const key = information.trello.key;
@@ -11,14 +11,14 @@ const candidateListName =  information.trello.candidateListName
 
 
 
-async function startSprint(projectName, sprintRecivedTasks){
+async function startSprint(projectName, sprintRecivedTasks, sprintLength, sprintName){
     const boardId = await trelloTools.getBoardIdByProjectName(projectName)
    const candidateListId = await getCandidateListId(boardId)
    const cardArr = await trelloTools.getCardsByBoardId(boardId)
    
    const cardToMoveArr = await compareCards(cardArr, sprintRecivedTasks)
    await trelloTools.moveCard(cardToMoveArr, candidateListId)
-    await DBManager.createSprintTrackerDB(projectName, 14, 88)
+    await test.createSprintTrackerDBTEST(projectName, sprintLength, sprintName)
 }
 
 
