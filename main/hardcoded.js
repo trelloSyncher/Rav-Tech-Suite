@@ -15,7 +15,8 @@ const information = {
     },
     collectionName:{
         cards: 'Card_model',
-        sprintTracker: 'Sprint_tracker'
+        sprintTracker: 'Sprint_tracker',
+        bugs: 'bugs'
 
     },
    

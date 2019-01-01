@@ -10,6 +10,7 @@ const key = information.trello.key;
 const token = information.trello.token;
 const idOrganization = information.trello.idOrganization
 const bugsListStr = information.trello.bugsBacklog
+const port = 5555;
 
 var app = express();
 
@@ -17,6 +18,9 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: true
 }))
+
+
+app.get('api/sprints/')
 
 /**
  * getting event about new project
@@ -93,6 +97,26 @@ app.get('/api/v1/:projectName/bugs', async function (req, res) {
 
 });
 
+
+/**
+ * sending info to SprintTracker module
+ * 
+ */
+
+
+app.get('/currentData', function (req, res) {
+
+console.log(req);
+
+
+
+
+    res.send("Hello from TrelloSyncher")
+
+});
+
+
+
 /**
  * sending the project board Url
  * @param {string} projectName thru url
@@ -101,11 +125,11 @@ app.get('/api/v1/:projectName/bugs', async function (req, res) {
 app.get('/api/:projectName', async function (req, res) {
     let data = req.params
     const projectName = await trelloTools.getBoardUrlByProjectName( data.projectName)
-
-
-
+    
+    
+    
     res.send(projectName)
-
+    
 });
 app.use(express.static('public'))
-app.listen(5555);
+app.listen(port);

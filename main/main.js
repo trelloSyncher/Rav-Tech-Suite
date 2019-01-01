@@ -21,8 +21,8 @@ function getProjectLaunchedPupsub() {
 const sprintRecivedTasks = ['H1','H2','H3','H4'] // TO DO this is a temp var. real one comes from plenner in a pupsub 
 const projectName =  'test';  // TO DO this is a temp var. real one comes from plenner in a pupsub 
 const sprintLength = 14;
-const sprintName = 'second test';
+const sprintName = 'first';
 // sprinter.startSprint(projectName, sprintRecivedTasks, sprintLength, sprintName)
-sprintTracker.run('5be42dc918f706736ed1849f', 2, sprintName)
+sprintTracker.run('5be42dc918f706736ed1849f', 4, sprintName)
 
 // create.getListId(getProjectLaunchedPupsub().templateName, getProjectLaunchedPupsub().projectName)

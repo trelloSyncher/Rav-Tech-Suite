@@ -84,8 +84,9 @@ async function getBoardIdByProjectName(projectName){
 
 async function getListNameByCardId(cardId){
     const allData = await axios.get(`https://api.trello.com/1/cards/${cardId}/list?fields=name&key=${key}&token=${token}`)
-console.log(allData.data.name);
-return allData.data.name
+// console.log(allData.data.name);
+const listName = allData.data.name
+return listName
 }
 
 async function getCandidateListId(boardId){
